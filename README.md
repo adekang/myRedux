@@ -4,5 +4,5 @@ yarn install
 ```
 # start
 ```
-yarn deb
+yarn dev
 ```
