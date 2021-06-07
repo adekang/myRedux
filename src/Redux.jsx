@@ -1,10 +1,8 @@
 import React, { useState, useContext, useEffect } from "react";
 
-export const store = {
-  state: {
-    user: { name: "ade", age: 18 },
-    group: { name: "前端組" },
-  },
+const store = {
+  state: undefined,
+  reducer: undefined,
   setState(newState) {
     store.state = newState;
     store.listeners.map(fn => fn(store.state));
@@ -17,6 +15,14 @@ export const store = {
       store.listeners.splice(index, 1);
     };
   },
+};
+let reducer = undefined;
+
+export const createStore = (reducer, initState) => {
+  store.state = initState;
+  store.reducer = reducer;
+
+  return store;
 };
 
 const changed = (oldState, newState) => {
@@ -33,7 +39,7 @@ export const connect = (selector, dispatchSelector) => Component => {
   return props => {
     const { state, setState } = useContext(appContext);
     const dispatch = action => {
-      setState(reducer(state, action));
+      setState(store.reducer(state, action));
     };
     const [, update] = useState({});
     const data = selector ? selector(state) : { state: state };
@@ -54,18 +60,8 @@ export const connect = (selector, dispatchSelector) => Component => {
   };
 };
 
-const reducer = (state, { type, payload }) => {
-  if (type === "updateUser") {
-    return {
-      ...state,
-      user: {
-        ...state.user,
-        ...payload,
-      },
-    };
-  } else {
-    return state;
-  }
-};
-
 export const appContext = React.createContext(null);
+
+export const Provider = ({ store, children }) => {
+  return <appContext.Provider value={store}>{children}</appContext.Provider>;
+};
