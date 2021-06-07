@@ -1,6 +1,7 @@
 import React from "react";
 
 import { appContext, store, connect } from "./Redux.jsx";
+import { connectToUser } from "./connecters/connectToUser.jsx";
 
 const App = () => {
   return (
@@ -43,21 +44,13 @@ const 三儿子 = connect(state => {
   );
 });
 
-const User = connect(state => {
-  return { user: state.user };
-})(({ user }) => {
+const User = connectToUser(({ user }) => {
   console.log("User执行了" + Math.random());
 
   return <div>User:{user.name}</div>;
 });
 
-const UserModifier = connect(null, dispatch => {
-  return {
-    updateUser: attrs => {
-      dispatch({ type: "updateUser", payload: attrs });
-    },
-  };
-})(({ updateUser, state, children }) => {
+const UserModifier = connectToUser(({ updateUser, user, children }) => {
   console.log("UserModifier执行了" + Math.random());
 
   const onChange = e => {
@@ -67,7 +60,7 @@ const UserModifier = connect(null, dispatch => {
   return (
     <div>
       {children}
-      <input value={state.user.name} onChange={onChange} />
+      <input value={user.name} onChange={onChange} />
     </div>
   );
 });
