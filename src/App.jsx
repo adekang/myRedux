@@ -1,24 +1,6 @@
-import React, { useState, useContext, useEffect } from "react";
+import React from "react";
 
-const appContext = React.createContext(null);
-
-const store = {
-  state: {
-    user: { name: "ade", age: 18 },
-  },
-  setState(newState) {
-    store.state = newState;
-    store.listeners.map(fn => fn(store.state));
-  },
-  listeners: [],
-  subscribe(fn) {
-    store.listeners.push(fn);
-    return () => {
-      const index = store.listeners.indexOf(fn);
-      store.listeners.splice(index, 1);
-    };
-  },
-};
+import { appContext, store, connect } from "./Redux.jsx";
 
 const App = () => {
   return (
@@ -49,49 +31,27 @@ const 二儿子 = () => {
     </section>
   );
 };
-const 三儿子 = () => {
+const 三儿子 = connect(state => {
+  return { group: state.group };
+})(({ group }) => {
   console.log("三儿子执行了" + Math.random());
 
-  return <section>三儿子</section>;
-};
-
-const connect = Component => {
-  return props => {
-    const { state, setState } = useContext(appContext);
-    const [, update] = useState({});
-    useEffect(() => {
-      store.subscribe(() => {
-        update({});
-      });
-    }, []);
-    const dispatch = action => {
-      setState(reducer(state, action));
-    };
-    return <Component {...props} dispatch={dispatch} state={state} />;
-  };
-};
-
-const User = connect(({ state, dispatch }) => {
-  console.log("User执行了" + Math.random());
-
-  return <div>User:{state.user.name}</div>;
+  return (
+    <section>
+      三儿子<div>Group:{group.name}</div>
+    </section>
+  );
 });
 
-const reducer = (state, { type, payload }) => {
-  if (type === "updateUser") {
-    return {
-      ...state,
-      user: {
-        ...state.user,
-        ...payload,
-      },
-    };
-  } else {
-    return state;
-  }
-};
+const User = connect(state => {
+  return { user: state.user };
+})(({ user }) => {
+  console.log("User执行了" + Math.random());
 
-const UserModifier = connect(({ dispatch, state, children }) => {
+  return <div>User:{user.name}</div>;
+});
+
+const UserModifier = connect()(({ dispatch, state, children }) => {
   console.log("UserModifier执行了" + Math.random());
 
   const onChange = e => {
