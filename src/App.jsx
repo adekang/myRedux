@@ -41,13 +41,14 @@ const User = () => {
 };
 
 const UserModifier = () => {
-  const contextValue = useContext(appContext);
+  const { appState, setAppState } = useContext(appContext);
   const onChange = e => {
-    
+    appState.user.name = e.target.value;
+    setAppState({ ...appState });
   };
   return (
     <div>
-      <input value={contextValue.appState.user.name} onChange={onChange} />
+      <input value={appState.user.name} onChange={onChange} />
     </div>
   );
 };
